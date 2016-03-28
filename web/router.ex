@@ -26,7 +26,10 @@ defmodule Todo.Router do
 
   scope "/api", Todo do
     pipe_through :api # Use the default browser stack
-    resources "/lists", ListController, except: [:new, :edit]
+    resources "/lists", ListController do
+      get "/checkboxes", CheckboxController, :index
+    end
+    resources "/checkboxes", CheckboxController
   end
 
 end
