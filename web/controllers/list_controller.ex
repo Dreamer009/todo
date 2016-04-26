@@ -2,18 +2,18 @@ defmodule Todo.ListController do
   use Todo.Web, :controller
 
   alias Todo.List
-  alias JaSerializer.PhoenixJsonApiHelper
+  alias JaSerializer.Params
 
   plug :scrub_params, "meta" when action in [:create, :update]
   plug :scrub_params, "data" when action in [:create, :update]
 
-  def index(conn, params) do
-    lists = List |> PhoenixJsonApiHelper.where_params(params) |> Repo.all
+  def index(conn, _params) do
+    lists = Repo.all(List)
     render(conn, "index.json", data: lists)
   end
 
-  def create(conn, %{"meta" => _meta, "data" => data = %{"type" => "list", "attributes" => list_params}}) do
-    changeset = List.changeset(%List{}, PhoenixJsonApiHelper.to_params(list_params, data["relationships"]))
+  def create(conn, %{"meta" => _meta, "data" => data = %{"type" => "list", "attributes" => _list_params}}) do
+    changeset = List.changeset(%List{}, Params.to_attributes(data))
 
     case Repo.insert(changeset) do
       {:ok, list} ->
@@ -33,9 +33,9 @@ defmodule Todo.ListController do
     render(conn, "show.json", data: list)
   end
 
-  def update(conn, %{"id" => id, "meta" => _meta, "data" => data = %{"type" => "list", "attributes" => list_params}}) do
+  def update(conn, %{"id" => id, "meta" => _meta, "data" => data = %{"type" => "list", "attributes" => _list_params}}) do
     list = List |> Ecto.Query.where(id: ^id) |> Repo.one!
-    changeset = List.changeset(list, PhoenixJsonApiHelper.to_params(list_params, data["relationships"]))
+    changeset = List.changeset(list, Params.to_attributes(data))
 
     case Repo.update(changeset) do
       {:ok, list} ->

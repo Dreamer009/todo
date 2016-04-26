@@ -3,7 +3,6 @@ defmodule Todo.List do
 
   schema "lists" do
     field :name, :string
-    has_many :checkboxes, Todo.Checkbox
 
     timestamps
   end
